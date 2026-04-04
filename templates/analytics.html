@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<main class="page-container">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+        <p class="page-subtitle">Comprehensive view of {{ city }}'s green infrastructure</p>
+    </div>
+
+    <!-- Key Stats -->
+    <div class="stats-grid-large">
+        <div class="stat-card-large green-card">
+            <div class="stat-icon-large">
+                <i class="fas fa-tree"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number-large">{{ stats.total_parks }}</div>
+                <div class="stat-label-large">Total Parks</div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i> +15 from last year
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card-large blue-card">
+            <div class="stat-icon-large">
+                <i class="fas fa-charging-station"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number-large">{{ stats.total_ev_stations }}</div>
+                <div class="stat-label-large">EV Stations</div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i> +60 from 2022
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card-large orange-card">
+            <div class="stat-icon-large">
+                <i class="fas fa-wind"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number-large">{{ stats.avg_aqi }}</div>
+                <div class="stat-label-large">Average AQI</div>
+                <div class="stat-trend negative">
+                    <i class="fas fa-arrow-down"></i> -25 improvement
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card-large green-card">
+            <div class="stat-icon-large">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number-large">{{ stats.green_cover_percent }}%</div>
+                <div class="stat-label-large">Green Cover</div>
+                <div class="stat-trend positive">
+                    <i class="fas fa-arrow-up"></i> +7% since 2022
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- Yearly Trend Chart -->
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-line"></i> Green Cover Trend (2020-2026)</h3>
+                <p>Historical and projected green cover percentage</p>
+            </div>
+            <div id="yearly-trend-chart"></div>
+        </div>
+
+        <!-- AQI by Location -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-smog"></i> AQI by Location</h3>
+                <p>Current air quality across different areas</p>
+            </div>
+            <div id="aqi-chart"></div>
+        </div>
+
+        <!-- Parks Distribution -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-tree"></i> Parks per District</h3>
+                <p>Distribution of green spaces</p>
+            </div>
+            <div id="parks-distribution-chart"></div>
+        </div>
+    </div>
+
+    <!-- ML Model Section -->
+    <div class="model-section">
+        <div class="model-card">
+            <div class="model-header">
+                <h3><i class="fas fa-robot"></i> About Our ML Model</h3>
+            </div>
+            <div class="model-grid">
+                <div class="model-detail">
+                    <div class="model-label">Algorithm</div>
+                    <div class="model-value">Random Forest Classifier</div>
+                </div>
+                <div class="model-detail">
+                    <div class="model-label">Framework</div>
+                    <div class="model-value">scikit-learn 1.3.2</div>
+                </div>
+                <div class="model-detail">
+                    <div class="model-label">Training Accuracy</div>
+                    <div class="model-value">100%</div>
+                </div>
+                <div class="model-detail">
+                    <div class="model-label">Testing Accuracy</div>
+                    <div class="model-value">99.5%</div>
+                </div>
+                <div class="model-detail">
+                    <div class="model-label">Features Used</div>
+                    <div class="model-value">AQI, Temperature, Green Cover %, Population Density</div>
+                </div>
+                <div class="model-detail">
+                    <div class="model-label">Target Variable</div>
+                    <div class="model-value">Needs Trees (Binary: Yes/No)</div>
+                </div>
+                <div class="model-detail">
+                    <div class="model-label">Training Data Size</div>
+                    <div class="model-value">1,000 samples</div>
+                </div>
+                <div class="model-detail">
+                    <div class="model-label">Last Updated</div>
+                    <div class="model-value">2026</div>
+                </div>
+            </div>
+            <div class="model-limitations">
+                <h4><i class="fas fa-exclamation-triangle"></i> Limitations</h4>
+                <ul>
+                    <li>Model trained on simulated data for demonstration purposes</li>
+                    <li>Real-world deployment would require actual ground truth data</li>
+                    <li>Predictions should be validated with local environmental experts</li>
+                    <li>Does not account for seasonal variations or extreme weather events</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="sources-section">
+        <h3><i class="fas fa-database"></i> Data Sources</h3>
+        <div class="sources-grid">
+            <div class="source-card">
+                <i class="fas fa-map"></i>
+                <h4>OpenStreetMap</h4>
+                <p>Parks and green spaces data</p>
+            </div>
+            <div class="source-card">
+                <i class="fas fa-satellite"></i>
+                <h4>Google Earth Engine</h4>
+                <p>Satellite imagery for tree cover analysis</p>
+            </div>
+            <div class="source-card">
+                <i class="fas fa-wind"></i>
+                <h4>IQAir / CPCB</h4>
+                <p>Air quality index monitoring</p>
+            </div>
+            <div class="source-card">
+                <i class="fas fa-charging-station"></i>
+                <h4>OpenChargeMap</h4>
+                <p>EV charging station locations</p>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    // Yearly Trend Chart
+    fetch('/api/yearly-trend')
+        .then(r => r.json())
+        .then(data => {
+            const traces = [
+                {
+                    x: data.years,
+                    y: data.green_cover,
+                    name: 'Green Cover %',
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: {color: '#2ecc71', width: 3},
+                    marker: {size: 10}
+                },
+                {
+                    x: data.years,
+                    y: data.parks.map(p => p / 5), // Scale down for visibility
+                    name: 'Parks (÷5)',
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    line: {color: '#3498db', width: 3},
+                    yaxis: 'y2'
+                }
+            ];
+            
+            const layout = {
+                margin: {t: 30, b: 50},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                xaxis: {title: 'Year'},
+                yaxis: {title: 'Green Cover %', range: [15, 40]},
+                yaxis2: {
+                    title: 'Parks Count (÷5)',
+                    overlaying: 'y',
+                    side: 'right'
+                },
+                showlegend: true,
+                legend: {x: 0.1, y: 1.1, orientation: 'h'}
+            };
+            
+            Plotly.newPlot('yearly-trend-chart', traces, layout, {responsive: true});
+        });
+    
+    // AQI Chart
+    fetch('/api/map-data')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success || !data.pollution) return;
+            
+            const trace = {
+                x: data.pollution.map(p => p.location),
+                y: data.pollution.map(p => p.aqi),
+                type: 'bar',
+                marker: {
+                    color: data.pollution.map(p => {
+                        if (p.aqi <= 50) return '#2ecc71';
+                        if (p.aqi <= 100) return '#f39c12';
+                        if (p.aqi <= 150) return '#e67e22';
+                        return '#e74c3c';
+                    })
+                },
+                text: data.pollution.map(p => `AQI: ${p.aqi}`),
+                textposition: 'auto'
+            };
+            
+            const layout = {
+                margin: {t: 20, b: 100},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                xaxis: {tickangle: -45},
+                yaxis: {title: 'AQI Value'}
+            };
+            
+            Plotly.newPlot('aqi-chart', [trace], layout, {responsive: true});
+        });
+    
+    // Parks Distribution (Pie Chart)
+    fetch('/api/district-comparison')
+        .then(r => r.json())
+        .then(data => {
+            const trace = {
+                labels: data.districts,
+                values: data.parks_2026,
+                type: 'pie',
+                marker: {
+                    colors: ['#2ecc71', '#3498db', '#9b59b6', '#e74c3c', '#f39c12', '#1abc9c']
+                },
+                textinfo: 'label+percent',
+                textposition: 'inside'
+            };
+            
+            const layout = {
+                margin: {t: 20},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                showlegend: false
+            };
+            
+            Plotly.newPlot('parks-distribution-chart', [trace], layout, {responsive: true});
+        });
+</script>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Years{% endblock %}
+
+{% block content %}
+<main class="page-container">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-chart-line"></i> Green Cover Evolution: 2022 → 2026</h1>
+        <p class="page-subtitle">Tracking {{ city }}'s journey towards sustainability</p>
+    </div>
+
+    <!-- Comparison Cards -->
+    <div class="comparison-section">
+        <div class="comparison-card baseline-card">
+            <div class="year-badge">2022</div>
+            <div class="comparison-content">
+                <div class="comparison-stat">
+                    <div class="comparison-number">28%</div>
+                    <div class="comparison-label">Green Cover</div>
+                </div>
+                <div class="comparison-details">
+                    <div class="detail-item">
+                        <i class="fas fa-tree"></i>
+                        <span>135 Parks</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-charging-station"></i>
+                        <span>15 EV Stations</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-wind"></i>
+                        <span>Avg AQI: 135</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-thermometer-half"></i>
+                        <span>Avg Temp: 34.2°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-arrow">
+            <i class="fas fa-arrow-right"></i>
+            <div class="improvement-badge">+7% Improvement</div>
+        </div>
+
+        <div class="comparison-card target-card">
+            <div class="year-badge success">2026 (Projected)</div>
+            <div class="comparison-content">
+                <div class="comparison-stat">
+                    <div class="comparison-number success">35%</div>
+                    <div class="comparison-label">Green Cover</div>
+                </div>
+                <div class="comparison-details">
+                    <div class="detail-item">
+                        <i class="fas fa-tree"></i>
+                        <span>165 Parks <span class="change-badge positive">+30</span></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-charging-station"></i>
+                        <span>75 EV Stations <span class="change-badge positive">+60</span></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-wind"></i>
+                        <span>Avg AQI: 98 <span class="change-badge positive">-37</span></span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-thermometer-half"></i>
+                        <span>Avg Temp: 32.7°C <span class="change-badge positive">-1.5°C</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact Highlights -->
+    <div class="impact-section">
+        <h2><i class="fas fa-trophy"></i> Key Achievements (2022-2026)</h2>
+        <div class="impact-grid">
+            <div class="impact-card">
+                <div class="impact-icon green">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="impact-value">+2,500</div>
+                <div class="impact-label">Trees Planted</div>
+                <div class="impact-desc">Native species focus</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon blue">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="impact-value">+30</div>
+                <div class="impact-label">New Parks</div>
+                <div class="impact-desc">Across 6 districts</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon orange">
+                    <i class="fas fa-lungs"></i>
+                </div>
+                <div class="impact-value">-27%</div>
+                <div class="impact-label">AQI Reduction</div>
+                <div class="impact-desc">Cleaner air quality</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon red">
+                    <i class="fas fa-temperature-low"></i>
+                </div>
+                <div class="impact-value">-1.5°C</div>
+                <div class="impact-label">Temperature Drop</div>
+                <div class="impact-desc">Urban heat reduction</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon purple">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="impact-value">+60</div>
+                <div class="impact-label">EV Chargers</div>
+                <div class="impact-desc">Green transport</div>
+            </div>
+            <div class="impact-card">
+                <div class="impact-icon teal">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <div class="impact-value">125 tons</div>
+                <div class="impact-label">CO₂ Offset</div>
+                <div class="impact-desc">Annually by new trees</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-section">
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-area"></i> Multi-Year Trend Analysis</h3>
+            </div>
+            <div id="trend-chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-bar"></i> District Comparison</h3>
+            </div>
+            <div id="district-chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fas fa-chart-pie"></i> Investment Breakdown</h3>
+            </div>
+            <div id="investment-chart"></div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    // Trend Chart
+    const trendData = [
+        {
+            x: [2020, 2021, 2022, 2023, 2024, 2025, 2026],
+            y: [22, 24, 28, 30, 32, 33.5, 35],
+            name: 'Green Cover %',
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: {color: '#2ecc71', width: 3},
+            fill: 'tozeroy',
+            fillcolor: 'rgba(46, 204, 113, 0.2)'
+        },
+        {
+            x: [2020, 2021, 2022, 2023, 2024, 2025, 2026],
+            y: [145, 140, 135, 128, 120, 110, 98],
+            name: 'Avg AQI',
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: {color: '#e74c3c', width: 3},
+            yaxis: 'y2'
+        }
+    ];
+
+    const trendLayout = {
+        margin: {t: 30, b: 50},
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        xaxis: {title: 'Year'},
+        yaxis: {title: 'Green Cover %', range: [15, 40]},
+        yaxis2: {
+            title: 'Average AQI',
+            overlaying: 'y',
+            side: 'right',
+            range: [80, 160]
+        },
+        showlegend: true,
+        legend: {x: 0.1, y: 1.1, orientation: 'h'}
+    };
+
+    Plotly.newPlot('trend-chart', trendData, trendLayout, {responsive: true});
+
+    // District Comparison
+    fetch('/api/district-comparison')
+        .then(r => r.json())
+        .then(data => {
+            const districtData = [
+                {
+                    x: data.districts,
+                    y: data.green_cover_2022,
+                    name: '2022',
+                    type: 'bar',
+                    marker: {color: '#95a5a6'}
+                },
+                {
+                    x: data.districts,
+                    y: data.green_cover_2026,
+                    name: '2026',
+                    type: 'bar',
+                    marker: {color: '#2ecc71'}
+                }
+            ];
+
+            Plotly.newPlot('district-chart', districtData, {
+                barmode: 'group',
+                margin: {t: 20, b: 50},
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                yaxis: {title: 'Green Cover %'}
+            }, {responsive: true});
+        });
+
+    // Investment Breakdown
+    const investmentData = [{
+        labels: ['Tree Plantation', 'New Parks', 'EV Infrastructure', 'Maintenance', 'Awareness'],
+        values: [35, 30, 20, 10, 5],
+        type: 'pie',
+        marker: {
+            colors: ['#2ecc71', '#3498db', '#9b59b6', '#f39c12', '#e74c3c']
+        }
+    }];
+
+    Plotly.newPlot('investment-chart', investmentData, {
+        margin: {t: 20},
+        paper_bgcolor: 'rgba(0,0,0,0)'
+    }, {responsive: true});
+</script>
+{% endblock %}
