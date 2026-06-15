@@ -1,11 +1,20 @@
-# utils/ml_predictor.py
+"""Tree-need prediction helpers.
 
-import pandas as pd
+The deployed Vercel environment is read-only, so this module avoids
+training or writing model files at import time. Local development can still
+train and persist the model when needed.
+"""
+
+from pathlib import Path
+
+import joblib
 import numpy as np
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-import joblib
-import os
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_PATH = BASE_DIR / "models" / "tree_predictor.pkl"
 
 def generate_training_data():
     np.random.seed(42)
@@ -37,19 +46,44 @@ def train_model():
     print(f"✅ Training Accuracy: {model.score(X_train, y_train) * 100:.2f}%")
     print(f"✅ Testing Accuracy: {model.score(X_test, y_test) * 100:.2f}%")
     
-    os.makedirs('models', exist_ok=True)
-    joblib.dump(model, 'models/tree_predictor.pkl')
+    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, MODEL_PATH)
     print("💾 Model saved!")
     return model
 
 
+def _load_model():
+    if not MODEL_PATH.exists():
+        return None
+    try:
+        return joblib.load(MODEL_PATH)
+    except Exception:
+        return None
+
+
+def _heuristic_prediction(aqi, temperature, green_cover, population_density):
+    needs_trees = bool((aqi > 120) and (green_cover < 25) and (temperature > 32))
+    confidence = 82.0 if needs_trees else 76.0
+
+    if needs_trees:
+        severity = "HIGH" if aqi > 150 else "MODERATE"
+        recommendation = f"{severity} priority. Plant {int((100 - green_cover) / 2)} trees/hectare."
+    else:
+        recommendation = "Sufficient green cover. Focus on maintenance."
+
+    return {
+        "needs_trees": needs_trees,
+        "confidence": confidence,
+        "recommendation": recommendation,
+        "fallback": True,
+    }
+
+
 def predict_tree_need(aqi, temperature, green_cover, population_density):
-    model_path = 'models/tree_predictor.pkl'
-    
-    if not os.path.exists(model_path):
-        train_model()
-    
-    model = joblib.load(model_path)
+    model = _load_model()
+    if model is None:
+        return _heuristic_prediction(aqi, temperature, green_cover, population_density)
+
     features = np.array([[aqi, temperature, green_cover, population_density]])
     
     prediction = model.predict(features)[0]
@@ -62,7 +96,7 @@ def predict_tree_need(aqi, temperature, green_cover, population_density):
     else:
         recommendation = "Sufficient green cover. Focus on maintenance."
     
-    return {'needs_trees': bool(prediction), 'confidence': round(confidence, 2), 'recommendation': recommendation}
+    return {'needs_trees': bool(prediction), 'confidence': round(confidence, 2), 'recommendation': recommendation, 'fallback': False}
 
 
 if __name__ == "__main__":

@@ -1,30 +1,31 @@
 # app.py - COMPLETE FIXED VERSION
 
+from pathlib import Path
+
 from flask import Flask, render_template, jsonify, request
 import sqlite3
 import pandas as pd
-import os
 import random
 
 # Import utilities
-from utils.ml_predictor import predict_tree_need, train_model
+from utils.ml_predictor import predict_tree_need
 from utils.analyzer import get_city_stats, get_aqi_category
 
 app = Flask(__name__)
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = BASE_DIR / 'data' / 'green_spaces.db'
 
 # Config
 app.config['CITY_NAME'] = 'Chennai'
 app.config['YEAR_RANGE'] = (2020, 2026)
 app.config['DATA_SOURCE'] = 'OpenStreetMap'
 
-# Ensure ML model exists
-if not os.path.exists('models/tree_predictor.pkl'):
-    print("🤖 Training ML model...")
-    train_model()
-
 def get_db():
     """Database connection helper"""
-    conn = sqlite3.connect('data/green_spaces.db')
+    if not DB_PATH.exists():
+        raise FileNotFoundError("Database not available")
+
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -81,6 +82,15 @@ def suggest():
 def map_data():
     """Get all map data (parks, EV stations, pollution)"""
     try:
+        if not DB_PATH.exists():
+            return jsonify({
+                'success': True,
+                'parks': [],
+                'ev_stations': [],
+                'pollution': [],
+                'stats': get_city_stats()
+            })
+
         conn = get_db()
         
         parks = pd.read_sql("SELECT * FROM parks LIMIT 100", conn).to_dict('records')
@@ -140,13 +150,19 @@ def area_details():
 def suggest_location():
     """Submit community suggestion"""
     try:
-        data = request.json
+        data = request.get_json(silent=True) or {}
         
         # Validate required fields
         required = ['name', 'latitude', 'longitude', 'type']
         for field in required:
             if not data.get(field):
                 return jsonify({'success': False, 'error': f'Missing field: {field}'}), 400
+
+        if not DB_PATH.exists():
+            return jsonify({
+                'success': False,
+                'error': 'Database not available in this deployment environment.'
+            }), 503
         
         conn = get_db()
         cursor = conn.cursor()
@@ -181,6 +197,9 @@ def suggest_location():
 def get_suggestions():
     """Get recent community suggestions"""
     try:
+        if not DB_PATH.exists():
+            return jsonify({'success': True, 'suggestions': []})
+
         conn = get_db()
         suggestions = pd.read_sql(
             "SELECT * FROM suggestions ORDER BY created_at DESC LIMIT 20",
@@ -235,7 +254,7 @@ def server_error(e):
 
 if __name__ == '__main__':
     # Check if database exists
-    if not os.path.exists('data/green_spaces.db'):
+    if not DB_PATH.exists():
         print("⚠️ Database not found! Run: python utils/data_fetcher.py")
     
     app.run(debug=True, port=5000)
